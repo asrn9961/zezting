@@ -4,6 +4,7 @@ const { Server } = require("socket.io");
 const cors = require("cors");
 
 const app = express();
+app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -14,7 +15,7 @@ const io = new Server(server, {
 const onlineUsers = {};
 
 io.on("connection", (socket) => {
-  // TEMP name until IP is registered
+  // Temporarily assign a placeholder name
   onlineUsers[socket.id] = "Loading...";
 
   socket.on("register-ip", (ip) => {
@@ -41,7 +42,6 @@ io.on("connection", (socket) => {
   });
 });
 
-// START THE SERVER
 server.listen(3000, () => {
-  console.log("Server running on port 3000");
+  console.log("Server is running on port 3000");
 });
