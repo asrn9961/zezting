@@ -24,8 +24,14 @@ app.get("/", (req, res) => {
 let onlineUsers = {};
 
 io.on("connection", (socket) => {
-  const browserName = `Browser${Math.floor(Math.random() * 10000)}`;
-  onlineUsers[socket.id] = browserName;
+  onlineUsers[socket.id] = "Loading...";
+
+socket.on("register-ip", (ip) => {
+  onlineUsers[socket.id] = ip;
+  io.emit("user-list", Object.values(onlineUsers));
+  socket.emit("your-name", ip);
+});
+
 
   io.emit("user-list", Object.values(onlineUsers));
   socket.emit("your-name", browserName);
