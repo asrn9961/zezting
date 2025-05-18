@@ -1,47 +1,34 @@
 const express = require("express");
 const http = require("http");
-const path = require("path");
-const cors = require("cors");
 const { Server } = require("socket.io");
+const cors = require("cors");
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: "*",
-    methods: ["GET", "POST"]
-  }
+  },
 });
 
-// Serve static files from the root (public) folder
-app.use(express.static("."));
-
-// Route to serve the homepage (chat UI)
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
-
-let onlineUsers = {};
+const onlineUsers = {};
 
 io.on("connection", (socket) => {
+  // TEMP name until IP is registered
   onlineUsers[socket.id] = "Loading...";
 
-socket.on("register-ip", (ip) => {
-  onlineUsers[socket.id] = ip;
-  io.emit("user-list", Object.values(onlineUsers));
-  socket.emit("your-name", ip);
-});
-
-
-  io.emit("user-list", Object.values(onlineUsers));
-  socket.emit("your-name", browserName);
+  socket.on("register-ip", (ip) => {
+    onlineUsers[socket.id] = ip;
+    io.emit("user-list", Object.values(onlineUsers));
+    socket.emit("your-name", ip);
+  });
 
   socket.on("send-message", ({ to, message }) => {
     for (const id in onlineUsers) {
       if (onlineUsers[id] === to) {
         io.to(id).emit("receive-message", {
           from: onlineUsers[socket.id],
-          message
+          message,
         });
         break;
       }
@@ -54,6 +41,7 @@ socket.on("register-ip", (ip) => {
   });
 });
 
-server.listen(5000, () => {
-  console.log("Server running on port 5000");
+// START THE SERVER
+server.listen(3000, () => {
+  console.log("Server running on port 3000");
 });
